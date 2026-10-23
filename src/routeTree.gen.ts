@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ConnexionRouteImport } from './routes/connexion'
+import { Route as GerantRouteImport } from './routes/gerant'
+import { Route as LivreurRouteImport } from './routes/livreur'
+import { Route as PanierRouteImport } from './routes/panier'
+import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
+import { Route as ArticlesIdRouteImport } from './routes/articles.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnexionRoute = ConnexionRouteImport.update({
+  id: '/connexion',
+  path: '/connexion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GerantRoute = GerantRouteImport.update({
+  id: '/gerant',
+  path: '/gerant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivreurRoute = LivreurRouteImport.update({
+  id: '/livreur',
+  path: '/livreur',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanierRoute = PanierRouteImport.update({
+  id: '/panier',
+  path: '/panier',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
+  id: '/articles/',
+  path: '/articles/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesIdRoute = ArticlesIdRouteImport.update({
+  id: '/articles/$id',
+  path: '/articles/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/connexion': typeof ConnexionRoute
+  '/gerant': typeof GerantRoute
+  '/livreur': typeof LivreurRoute
+  '/panier': typeof PanierRoute
+  '/articles/$id': typeof ArticlesIdRoute
+  '/articles/': typeof ArticlesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/connexion': typeof ConnexionRoute
+  '/gerant': typeof GerantRoute
+  '/livreur': typeof LivreurRoute
+  '/panier': typeof PanierRoute
+  '/articles/$id': typeof ArticlesIdRoute
+  '/articles': typeof ArticlesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/connexion': typeof ConnexionRoute
+  '/gerant': typeof GerantRoute
+  '/livreur': typeof LivreurRoute
+  '/panier': typeof PanierRoute
+  '/articles/$id': typeof ArticlesIdRoute
+  '/articles/': typeof ArticlesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/connexion'
+    | '/gerant'
+    | '/livreur'
+    | '/panier'
+    | '/articles/$id'
+    | '/articles/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/connexion'
+    | '/gerant'
+    | '/livreur'
+    | '/panier'
+    | '/articles/$id'
+    | '/articles'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/connexion'
+    | '/gerant'
+    | '/livreur'
+    | '/panier'
+    | '/articles/$id'
+    | '/articles/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  ConnexionRoute: typeof ConnexionRoute
+  GerantRoute: typeof GerantRoute
+  LivreurRoute: typeof LivreurRoute
+  PanierRoute: typeof PanierRoute
+  ArticlesIdRoute: typeof ArticlesIdRoute
+  ArticlesIndexRoute: typeof ArticlesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connexion': {
+      id: '/connexion'
+      path: '/connexion'
+      fullPath: '/connexion'
+      preLoaderRoute: typeof ConnexionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gerant': {
+      id: '/gerant'
+      path: '/gerant'
+      fullPath: '/gerant'
+      preLoaderRoute: typeof GerantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/livreur': {
+      id: '/livreur'
+      path: '/livreur'
+      fullPath: '/livreur'
+      preLoaderRoute: typeof LivreurRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panier': {
+      id: '/panier'
+      path: '/panier'
+      fullPath: '/panier'
+      preLoaderRoute: typeof PanierRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/': {
+      id: '/articles/'
+      path: '/articles'
+      fullPath: '/articles/'
+      preLoaderRoute: typeof ArticlesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/$id': {
+      id: '/articles/$id'
+      path: '/articles/$id'
+      fullPath: '/articles/$id'
+      preLoaderRoute: typeof ArticlesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  ConnexionRoute: ConnexionRoute,
+  GerantRoute: GerantRoute,
+  LivreurRoute: LivreurRoute,
+  PanierRoute: PanierRoute,
+  ArticlesIdRoute: ArticlesIdRoute,
+  ArticlesIndexRoute: ArticlesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
