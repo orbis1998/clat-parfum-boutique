@@ -45,7 +45,7 @@ function Cart() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!lines.length || !commune || !zone) return toast.error("Choisissez votre commune et zone");
+    if (!lines.length || !commune || !zone) { toast.error("Choisissez votre commune et zone"); return; }
     const order: Order = {
       id: "CMD-" + uid().toUpperCase().slice(0, 5),
       createdAt: new Date().toISOString(),
