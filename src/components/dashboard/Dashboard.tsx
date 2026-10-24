@@ -17,7 +17,7 @@ const STATUSES: OrderStatus[] = ["nouvelle", "confirmée", "en livraison", "livr
 export function Dashboard({ role }: { role: Role }) {
   const user = useSessionUser();
   const nav = useNavigate();
-  const [tab, setTab] = useState<Tab>(TABS[role][0][0]);
+  const [tab, setTab] = useState<Tab>(TABS[role][0]![0]);
   if (!user || (user.role !== role && user.role !== "admin"))
     return (
       <div className="min-h-screen grid place-items-center text-center px-5">
@@ -124,7 +124,7 @@ function Products() {
   const products = useStore((s) => s.products);
   const [edit, setEdit] = useState<Product | null>(null);
   const save = () => {
-    if (!edit || !edit.name) return toast.error("Nom requis");
+    if (!edit || !edit.name) { toast.error("Nom requis"); return; }
     setState((s) => ({ products: s.products.some((p) => p.id === edit.id) ? s.products.map((p) => (p.id === edit.id ? edit : p)) : [...s.products, edit] }));
     setEdit(null);
     toast.success("Produit enregistré");
@@ -142,7 +142,7 @@ function Products() {
             <L t="Famille"><input className="field" value={e.family} onChange={(x) => set({ family: x.target.value })} /></L>
             <L t="Notes"><input className="field" value={e.notes} onChange={(x) => set({ notes: x.target.value })} /></L>
             <L t="Image (URL)"><input className="field" value={e.image.startsWith("data:") ? "(fichier importé)" : e.image} onChange={(x) => set({ image: x.target.value })} /></L>
-            <L t="Ou importer"><input type="file" accept="image/*" className="field" onChange={(x) => { const f = x.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => set({ image: String(r.result) }); r.readAsDataURL(f); }} /></L>
+            <L t="Ou importer"><input type="file" accept="image/*" className="field" onChange={(x) => { const f = x.target.files?.[0]; if (!f) return undefined; const r = new FileReader(); r.onload = () => set({ image: String(r.result) }); r.readAsDataURL(f); }} /></L>
           </div>
           <L t="Description"><textarea className="field" rows={3} value={e.description} onChange={(x) => set({ description: x.target.value })} /></L>
           <label className="flex gap-2 text-sm items-center"><input type="checkbox" checked={e.featured} onChange={(x) => set({ featured: x.target.checked })} /> Afficher dans le héro (balayage)</label>
@@ -282,8 +282,8 @@ function StaffMgr() {
         <L t="Mot de passe"><input className="field" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} /></L>
         <L t="Rôle"><select className="field" value={f.role} onChange={(e) => setF({ ...f, role: e.target.value as Role })}><option value="livreur">Livreur</option><option value="gerant">Gérant</option><option value="admin">Admin</option></select></L>
         <button className="btn-lux" onClick={() => {
-          if (!f.name || !f.badge || !f.password) return toast.error("Champs requis");
-          if (staff.some((u) => u.badge === f.badge)) return toast.error("Badge déjà utilisé");
+          if (!f.name || !f.badge || !f.password) { toast.error("Champs requis"); return; }
+          if (staff.some((u) => u.badge === f.badge)) { toast.error("Badge déjà utilisé"); return; }
           setState((s) => ({ staff: [...s.staff, f] })); setF({ ...f, badge: "", password: "", name: "" }); toast.success("Compte créé");
         }}>Créer le compte</button>
       </Card>
