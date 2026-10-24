@@ -79,7 +79,8 @@ function Overview() {
 
 function Orders({ role, badge }: { role: Role; badge: string }) {
   const all = useStore((s) => s.orders);
-  const livreurs = useStore((s) => s.staff.filter((u) => u.role === "livreur" && u.active));
+  const staffAll = useStore((s) => s.staff);
+  const livreurs = staffAll.filter((u) => u.role === "livreur" && u.active);
   const orders = role === "livreur" ? all.filter((o) => o.livreur === badge) : all;
   const upd = (id: string, patch: object) => setState((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, ...patch } : o)) }));
   if (!orders.length) return <p className="text-muted-foreground">Aucune commande pour le moment.</p>;

@@ -18,7 +18,8 @@ export const Route = createFileRoute("/")({
 
 function Hero() {
   const settings = useStore((s) => s.settings);
-  const products = useStore((s) => s.products.filter((p) => p.featured));
+  const allProducts = useStore((s) => s.products);
+  const products = allProducts.filter((p) => p.featured);
   const [i, setI] = useState(0);
   useEffect(() => {
     if (products.length < 2) return;
