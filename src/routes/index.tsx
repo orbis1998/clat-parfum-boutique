@@ -1,16 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { SiteLayout } from "@/components/SiteLayout";
-import { fmtUSD, useStore } from "@/lib/store";
+import { STORE_NAME, STORE_SEO_DESCRIPTION, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Kinoir Parfums — Parfums de luxe à Kinshasa" },
-      { name: "description", content: "Parfums de niche et grandes maisons livrés dans les 24 communes de Kinshasa. Commande via WhatsApp." },
-      { property: "og:title", content: "Kinoir Parfums — Parfums de luxe à Kinshasa" },
-      { property: "og:description", content: "Parfums de luxe livrés partout à Kinshasa, commande via WhatsApp." },
+      { title: STORE_NAME },
+      { name: "description", content: STORE_SEO_DESCRIPTION },
+      { property: "og:title", content: STORE_NAME },
+      { property: "og:description", content: STORE_SEO_DESCRIPTION },
     ],
   }),
   component: Home,
@@ -18,61 +18,64 @@ export const Route = createFileRoute("/")({
 
 function Hero() {
   const settings = useStore((s) => s.settings);
-  const allProducts = useStore((s) => s.products);
-  const products = allProducts.filter((p) => p.featured);
+  const products = useStore((s) => s.products);
+  const slides = useMemo(() => {
+    const fromSettings = (settings.heroImages ?? []).filter(Boolean);
+    if (fromSettings.length) return fromSettings;
+    return products.filter((p) => p.featured && p.image).map((p) => p.image);
+  }, [settings.heroImages, products]);
   const [i, setI] = useState(0);
+
   useEffect(() => {
-    if (products.length < 2) return;
-    const t = setInterval(() => setI((x) => (x + 1) % products.length), 4500);
+    if (slides.length < 2) return;
+    const t = setInterval(() => setI((x) => (x + 1) % slides.length), 5000);
     return () => clearInterval(t);
-  }, [products.length]);
-  const p = products[i % Math.max(products.length, 1)];
+  }, [slides]);
+
+  const safe = Math.max(slides.length, 1);
 
   return (
-    <section className="relative overflow-hidden bg-primary text-primary-foreground">
-      <div className="mx-auto max-w-7xl px-5 grid md:grid-cols-2 gap-10 items-center min-h-[86vh] py-14">
-        <div className="animate-rise">
-          <p className="eyebrow text-gold">Collection 2026</p>
-          <h1 className="mt-5 text-5xl md:text-7xl leading-[1.02]">{settings.heroTitle}</h1>
-          <p className="mt-6 max-w-md opacity-75">{settings.heroSubtitle}</p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link to="/articles" className="btn-lux !bg-gold !text-ink hover:!bg-primary-foreground">Découvrir</Link>
-            {p && (
-              <Link to="/articles/$id" params={{ id: p.id }} className="btn-ghost-lux">{p.name}</Link>
-            )}
-          </div>
-          {p && (
-            <div key={p.id} className="mt-14 animate-rise border-t border-primary-foreground/20 pt-6 flex items-end justify-between max-w-md">
-              <div>
-                <p className="eyebrow opacity-60 !text-[0.6rem]">{p.family} · {p.notes}</p>
-                <p className="font-display text-3xl mt-1">{p.name}</p>
-              </div>
-              <p className="font-display text-3xl text-gold">{fmtUSD(Math.min(...p.variants.map((v) => v.price)))}</p>
-            </div>
-          )}
+    <section className="relative min-h-[78vh] sm:min-h-[86vh] flex items-end overflow-hidden bg-[#19110b] text-white">
+      <div className="absolute inset-0" aria-hidden="true">
+        {slides.map((src, k) => (
+          <img
+            key={`${src}-${k}`}
+            src={src}
+            alt=""
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${k === i % safe ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/15" />
+      </div>
+
+      <div className="relative z-10 container-page w-full pb-12 pt-28 sm:pb-16 sm:pt-32 animate-rise">
+        <h1 className="max-w-3xl text-[2rem] leading-[1.1] sm:text-5xl md:text-6xl tracking-[0.4px] font-normal">
+          {settings.heroTitle}
+        </h1>
+        <p className="mt-4 sm:mt-5 max-w-md text-sm text-white/80 tracking-[0.4px] leading-relaxed">
+          {settings.heroSubtitle}
+        </p>
+        <div className="mt-8 sm:mt-10">
+          <Link
+            to="/articles"
+            className="inline-flex items-center justify-center min-h-11 sm:min-h-12 px-6 sm:px-7 rounded-full border border-white/80 bg-white/15 text-[11px] sm:text-[12px] uppercase tracking-[0.16em] backdrop-blur-md hover:bg-white hover:text-[#1a1a1a] transition-colors"
+          >
+            Découvrir
+          </Link>
         </div>
-        <div className="relative aspect-[4/5] w-full max-w-lg mx-auto">
-          {p && (
-            <div key={p.id} className="absolute inset-0 overflow-hidden animate-sweep shadow-lux">
-              <img src={p.image} alt={p.name} width={800} height={1000} className="h-full w-full object-cover" />
-              <span className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-card/40 blur-2xl animate-shine" />
-            </div>
-          )}
-          <div className="absolute -bottom-5 left-0 right-0 flex justify-center gap-2">
-            {products.map((x, k) => (
-              <button key={x.id} onClick={() => setI(k)} aria-label={x.name} className={`h-[2px] transition-all ${k === i ? "w-10 bg-gold" : "w-5 bg-primary-foreground/30"}`} />
+        {slides.length > 1 ? (
+          <div className="mt-10 sm:mt-12 flex gap-2">
+            {slides.map((src, k) => (
+              <button
+                key={`${src}-dot-${k}`}
+                type="button"
+                aria-label={`Image ${k + 1}`}
+                onClick={() => setI(k)}
+                className={`h-[2px] transition-all ${k === i % slides.length ? "w-8 sm:w-10 bg-white" : "w-4 sm:w-5 bg-white/35"}`}
+              />
             ))}
           </div>
-        </div>
-      </div>
-      <div className="border-t border-primary-foreground/15 overflow-hidden py-4">
-        <div className="flex w-max animate-marquee gap-12">
-          {[...products, ...products, ...products, ...products].map((x, k) => (
-            <span key={k} className="flex items-center gap-4 font-display text-2xl opacity-70 whitespace-nowrap">
-              <img src={x.image} alt="" className="h-10 w-8 object-cover" /> {x.name} <span className="text-gold">✦</span>
-            </span>
-          ))}
-        </div>
+        ) : null}
       </div>
     </section>
   );
@@ -80,42 +83,39 @@ function Hero() {
 
 function Home() {
   const products = useStore((s) => s.products);
-  const posts = useStore((s) => s.posts);
+
   return (
     <SiteLayout>
       <Hero />
-      <section className="mx-auto max-w-7xl px-5 py-24">
-        <div className="text-center mb-14">
-          <p className="eyebrow text-gold">Sélection</p>
-          <h2 className="text-5xl mt-3">Nos fragrances</h2>
+
+      <section className="container-page py-14 sm:py-20 md:py-24">
+        <div className="flex items-end justify-between gap-4 mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl tracking-[0.4px] font-normal">Sélection</h2>
+          <Link to="/articles" className="text-[11px] sm:text-[12px] uppercase tracking-[0.16em] hover:opacity-55">
+            Tout voir
+          </Link>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
-          {products.slice(0, 8).map((p) => <ProductCard key={p.id} p={p} />)}
-        </div>
-        <div className="text-center mt-14"><Link to="/articles" className="btn-ghost-lux">Voir tous les articles</Link></div>
-      </section>
-      <section className="bg-secondary">
-        <div className="mx-auto max-w-7xl px-5 py-20 grid md:grid-cols-3 gap-10 text-center">
-          {[["Authenticité", "Flacons 100% originaux, sélectionnés à la source."], ["Livraison", "Dans les 24 communes de Kinshasa, au jour choisi."], ["WhatsApp", "Commandez et échangez directement avec notre équipe."]].map(([t, d]) => (
-            <div key={t}><p className="font-display text-3xl">{t}</p><p className="mt-2 text-sm text-muted-foreground">{d}</p></div>
-          ))}
-        </div>
-      </section>
-      {posts.length > 0 && (
-        <section className="mx-auto max-w-7xl px-5 pt-24">
-          <p className="eyebrow text-gold text-center">Journal</p>
-          <h2 className="text-5xl mt-3 text-center mb-12">Le carnet olfactif</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {posts.map((post) => (
-              <article key={post.id} className="border-t pt-6">
-                <p className="eyebrow text-muted-foreground !text-[0.6rem]">{post.date}</p>
-                <h3 className="text-3xl mt-2">{post.title}</h3>
-                <p className="mt-2 text-muted-foreground">{post.excerpt}</p>
-              </article>
+        {products.length ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-12">
+            {products.slice(0, 8).map((p) => (
+              <ProductCard key={p.id} p={p} />
             ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <div className="py-16 text-center text-sm text-[#727272] tracking-[0.4px]">Catalogue en cours de mise à jour</div>
+        )}
+      </section>
+
+      <section className="bg-[#f8f8f8]">
+        <div className="container-page py-14 sm:py-20 md:py-24 max-w-3xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-[0.4px] leading-tight font-normal">
+            Des parfums choisis avec soin.
+          </h2>
+          <p className="mt-5 text-sm text-[#545454] leading-relaxed tracking-[0.4px] max-w-md">
+            Commandez à partir de 5 pièces et faites-vous livrer à Kinshasa.
+          </p>
+        </div>
+      </section>
     </SiteLayout>
   );
 }
